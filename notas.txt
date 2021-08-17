@@ -1,0 +1,39 @@
+- Calibracion del Modelo de Admision Recolocado:
+
+Con respecto al Modelo Actual:
+
+- Se construyo en agosto del 2020 en base:
+
+    Train: Desde el 201510 hasta 201902, usando validacion cruzada.
+    Tamanio: 3171.
+
+- Se realizo un seguimiento:
+
+    OOT: Desde 201903 hasta 201910.
+    Tamanio: 860.
+
+Los campos que se usan en el modelo son:
+
+    - edad (Dem)
+    - perfil (Dem)
+    - cuota (int)
+    - ci (int)
+    - pv (int)
+    - marca (int)
+    - linea_total_1m (RCC)
+    - frec_mora60_1m12 (RCC)
+    - mora_max1m3_max4m12 (RCC)
+
+    => Dem: 2/9, Int: 4/9, RCC: 3/9
+
+Los IV's fueron:
+
+    - En train minimo 2.70% y maximo 5.10% 
+
+Correlacion maxima de 25.47%
+
+Indicadores:
+
+    - Gini: Train (25.09%)
+    - AUC: Train (62.54%)
+    - KS: Train (20.31%)
