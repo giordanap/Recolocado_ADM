@@ -15,6 +15,7 @@ library(aod) # Prueba Wald modelo
 library(ResourceSelection) # Prueba Hosmer Lemeshow
 library(dplyr) # Frecuencia de categoricas en el manual
 require(tcltk) # Mensaje de alerta de finalizacion de procesos
+
 ```
 
 ```{r}
@@ -631,10 +632,10 @@ data[, 'malo'] = as.factor(data$malo)
 # for (i in var) {
 #   if ( class( data[, i] ) == 'factor') {
 #     data[, i] = as.character(data[, i])
-#   } else { 
+#   } else {
 #       if ( class( data[, i] ) == 'integer' ) {
 #         data[, i] = as.numeric(data[, i])
-#       } 
+#       }
 #   }
 #   writeLines(class( data[, i] ))
 # }
@@ -695,11 +696,19 @@ head(X_train_cat, 2)
 ```
 
 ```{r}
+dim(X_train_num)
+```
+
+```{r}
 head(X_test_num, 2)
 ```
 
 ```{r}
 head(X_test_cat, 2)
+```
+
+```{r}
+dim(X_test_num)
 ```
 
 ```{r}
@@ -711,6 +720,10 @@ y_test[,1][1:25]
 ```
 
 ```{r}
+str(X_train_num)
+```
+
+```{r}
 #################################
 ######      woeBinning      #####
 #################################
@@ -719,27 +732,33 @@ y_test[,1][1:25]
 ```{r}
 # IV (criterio 01)
 
-# start_time = as.numeric(Sys.time())
+start_time = as.numeric(Sys.time())
 
-# data_woeBinning = woe.binning(data, "tm", colnames(data[,var]), min.perc.total=0.05)
+data = X_train_num
 
-# n = dim( data_woeBinning )[1]
-# data_wbng = data.frame( "var" = 1:n )
+var = c()
+
+for (i in colnames(data)) { if ( sum( is.na( data[, colnames(data)[1]] ) ) <= dim(data)[1] ) { var_num = append(var_num, i) } }
+
+data_woeBinning = woe.binning(data, "tm", colnames(data[, var]), min.perc.total=0.05)
+
+n = dim( data_woeBinning )[1]
+data_wbng = data.frame( "var" = 1:n )
+
+for (i in 1:n ) {
+
+    data_wbng[i, 'var'] = data_woeBinning[,1][[i]]
+    data_wbng[i, 'iv'] = data_woeBinning[,3][[i]]
+
+}
+
+time_process('Lista de woeBinning', start_time)
+
+write.table(data_wbng,paste(readline(),"data_wbng.csv",sep="\\"), sep=',')
+
+# data_wbng = read.table(file.choose(), header = T, sep = ',')
 # 
-# for (i in 1:n ) {
-# 
-#     data_wbng[i, 'var'] = data_woeBinning[,1][[i]]
-#     data_wbng[i, 'iv'] = data_woeBinning[,3][[i]]
-# 
-# }
-
-# time_process('Lista de woeBinning', start_time)
-
-# write.table(data_wbng,paste(readline(),"data_wbng.csv",sep="\\"), sep=',')
-
-data_wbng = read.table(file.choose(), header = T, sep = ',')
-
-var = as.character(data_wbng[data_wbng[,'iv'] >= 0.02 & data_wbng[,'iv'] < 0.5,]$var)
+# var = as.character(data_wbng[data_wbng[,'iv'] >= 0.02 & data_wbng[,'iv'] < 0.5,]$var)
 
 ```
 
