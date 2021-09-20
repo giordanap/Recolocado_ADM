@@ -1,0 +1,295 @@
+```{r}
+
+data_train = cbind(X_train_cat[, var_cat], y_train)
+
+data_train[, 'tm'] = data_train$malo
+data_train[, 'malo'] = as.factor(data_train$malo)
+
+data_test = cbind(X_test_cat[, var_cat], y_test)
+
+data_test[, 'tm'] = data_test$malo
+data_test[, 'malo'] = as.factor(data_test$malo)
+
+# imputaciones
+data_train[,'rec_calificacion_1234_1m12'] = as.numeric(X_train_cat[,'rec_calificacion_1234_1m12'])
+#
+data_test[,'rec_calificacion_1234_1m12'] = as.numeric(X_test_cat[,'rec_calificacion_1234_1m12'])
+
+########################################################################
+
+# # linea_activa_max1m3_max4m12
+# data_train$linea_activa_max1m3_max4m12_woe = ifelse( is.na(data_train$linea_activa_max1m3_max4m12), -0.0670,
+#       ifelse(data_train$linea_activa_max1m3_max4m12 %in% c("Cero linea_activa"), -0.0670,
+#       ifelse(data_train$linea_activa_max1m3_max4m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.3055, 0)))
+# data_test$linea_activa_max1m3_max4m12_woe = ifelse( is.na(data_test$linea_activa_max1m3_max4m12), -0.0670,
+#       ifelse(data_test$linea_activa_max1m3_max4m12 %in% c("Cero linea_activa"), -0.0670,
+#       ifelse(data_test$linea_activa_max1m3_max4m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.3055, 0)))
+# # linea_activa_1m_max2m12
+# data_train$linea_activa_1m_max2m12_woe = ifelse( is.na(data_train$linea_activa_1m_max2m12), -0.0848,
+#       ifelse(data_train$linea_activa_1m_max2m12 %in% c("Cero linea_activa"), -0.0848	,
+#       ifelse(data_train$linea_activa_1m_max2m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.2986, 0)))
+# data_test$linea_activa_1m_max2m12_woe = ifelse( is.na(data_test$linea_activa_1m_max2m12), -0.0848,
+#       ifelse(data_test$linea_activa_1m_max2m12 %in% c("Cero linea_activa"), -0.0848	,
+#       ifelse(data_test$linea_activa_1m_max2m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.2986, 0)))
+# linea_activa_max1m6_max7m12
+data_train$linea_activa_max1m6_max7m12_woe = ifelse( is.na(data_train$linea_activa_max1m6_max7m12), -0.0848,
+      ifelse(data_train$linea_activa_max1m6_max7m12 %in% c("Cero linea_activa"), -0.0848,
+      ifelse(data_train$linea_activa_max1m6_max7m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.2986, 0)))
+data_test$linea_activa_max1m6_max7m12_woe = ifelse( is.na(data_test$linea_activa_max1m6_max7m12), -0.0848,
+      ifelse(data_test$linea_activa_max1m6_max7m12 %in% c("Cero linea_activa"), -0.0848,
+      ifelse(data_test$linea_activa_max1m6_max7m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.2986, 0)))
+# linea_activa_var1m12
+data_train$linea_activa_var1m12_woe = ifelse( is.na(data_train$linea_activa_var1m12), -0.0886,
+      ifelse(data_train$linea_activa_var1m12 %in% c("Cero linea_activa"), -0.0886,
+      ifelse(data_train$linea_activa_var1m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.3209, 0)))
+data_test$linea_activa_var1m12_woe = ifelse( is.na(data_test$linea_activa_var1m12), -0.0886,
+      ifelse(data_test$linea_activa_var1m12 %in% c("Cero linea_activa"), -0.0886,
+      ifelse(data_test$linea_activa_var1m12 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.3209, 0)))
+# linea_activa_var1m6
+data_train$linea_activa_var1m6_woe = ifelse( is.na(data_train$linea_activa_var1m6), -0.0818,
+      ifelse(data_train$linea_activa_var1m6 %in% c("Cero linea_activa"), -0.0818,
+      ifelse(data_train$linea_activa_var1m6 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.3402, 0)))
+data_test$linea_activa_var1m6_woe = ifelse( is.na(data_test$linea_activa_var1m6), -0.0818,
+      ifelse(data_test$linea_activa_var1m6 %in% c("Cero linea_activa"), -0.0818,
+      ifelse(data_test$linea_activa_var1m6 %in% c("Igual linea_activa","Mayor linea_activa","Menor linea_activa"), 0.3402, 0)))
+# por_mora_0_min1m6_min7m12
+data_train$por_mora_0_min1m6_min7m12_woe = ifelse( is.na(data_train$por_mora_0_min1m6_min7m12), -0.0475,
+      ifelse(data_train$por_mora_0_min1m6_min7m12 %in% c("Cero por_mora_0","Menor por_mora_0","Igual por_mora_0", "Mayor por_mora_0"), -0.0475,
+      ifelse(data_train$por_mora_0_min1m6_min7m12 %in% c("Cien por_mora_0"), 0.4825, 0)))
+data_test$por_mora_0_min1m6_min7m12_woe = ifelse( is.na(data_test$por_mora_0_min1m6_min7m12), -0.0475,
+      ifelse(data_test$por_mora_0_min1m6_min7m12 %in% c("Cero por_mora_0","Menor por_mora_0","Igual por_mora_0", "Mayor por_mora_0"), -0.0475,
+      ifelse(data_test$por_mora_0_min1m6_min7m12 %in% c("Cien por_mora_0"), 0.4825, 0)))
+# perfil
+data_train$perfil_woe = ifelse( is.na(data_train$perfil), -0.0563,
+      ifelse(data_train$perfil %in% c("5.Propietario"),  0.3643, -0.0563))
+data_test$perfil_woe = ifelse( is.na(data_test$perfil), -0.0563,
+      ifelse(data_test$perfil %in% c("5.Propietario"), 0.3643, -0.0563))
+# linea_activa_max1m12_flg
+data_train$linea_activa_max1m12_flg_woe = ifelse( is.na(data_train$linea_activa_max1m12_flg), -0.0848,
+      ifelse(data_train$linea_activa_max1m12_flg %in% c("ConLinea"), 0.2986,
+      ifelse(data_train$linea_activa_max1m12_flg %in% c("SinLinea"), -0.0848, 0)))
+data_test$linea_activa_max1m12_flg_woe = ifelse( is.na(data_test$linea_activa_max1m12_flg), -0.0848,
+      ifelse(data_test$linea_activa_max1m12_flg %in% c("ConLinea"), 0.2986,
+      ifelse(data_test$linea_activa_max1m12_flg %in% c("SinLinea"), -0.0848, 0)))
+# linea_total_max1m12_flg
+data_train$linea_total_max1m12_flg_woe = ifelse( is.na(data_train$linea_total_max1m12_flg), -0.0882,
+      ifelse(data_train$linea_total_max1m12_flg %in% c("ConLinea"), 0.3041,
+      ifelse(data_train$linea_total_max1m12_flg %in% c("SinLinea"), -0.0882, 0)))
+data_test$linea_total_max1m12_flg_woe = ifelse( is.na(data_test$linea_total_max1m12_flg), -0.0882,
+      ifelse(data_test$linea_total_max1m12_flg %in% c("ConLinea"), 0.3041,
+      ifelse(data_test$linea_total_max1m12_flg %in% c("SinLinea"), -0.0882, 0)))
+# linea_activa_max1m6_flg
+data_train$linea_activa_max1m6_flg_woe = ifelse( is.na(data_train$linea_activa_max1m6_flg), -0.0818,
+      ifelse(data_train$linea_activa_max1m6_flg %in% c("ConLinea"), 0.3402,
+      ifelse(data_train$linea_activa_max1m6_flg %in% c("SinLinea"), -0.0818, 0)))
+data_test$linea_activa_max1m6_flg_woe = ifelse( is.na(data_test$linea_activa_max1m6_flg), -0.0818,
+      ifelse(data_test$linea_activa_max1m6_flg %in% c("ConLinea"), 0.3402,
+      ifelse(data_test$linea_activa_max1m6_flg %in% c("SinLinea"), -0.0818, 0)))
+# linea_activa_max1m3_flg
+data_train$linea_activa_max1m3_flg_woe = ifelse( is.na(data_train$linea_activa_max1m3_flg), -0.0803,
+      ifelse(data_train$linea_activa_max1m3_flg %in% c("ConLinea"), 0.3670,
+      ifelse(data_train$linea_activa_max1m3_flg %in% c("SinLinea"), -0.0803, 0)))
+data_test$linea_activa_max1m3_flg_woe = ifelse( is.na(data_test$linea_activa_max1m3_flg), -0.0803,
+      ifelse(data_test$linea_activa_max1m3_flg %in% c("ConLinea"), 0.3670,
+      ifelse(data_test$linea_activa_max1m3_flg %in% c("SinLinea"), -0.0803, 0)))
+# linea_total_max1m3_flg
+data_train$linea_total_max1m3_flg_woe = ifelse( is.na(data_train$linea_total_max1m3_flg), -0.0858,
+      ifelse(data_train$linea_total_max1m3_flg %in% c("ConLinea"), 0.3902,
+      ifelse(data_train$linea_total_max1m3_flg %in% c("SinLinea"), -0.0858, 0)))
+data_test$linea_total_max1m3_flg_woe = ifelse( is.na(data_test$linea_total_max1m3_flg), -0.0858,
+      ifelse(data_test$linea_total_max1m3_flg %in% c("ConLinea"), 0.3902,
+      ifelse(data_test$linea_total_max1m3_flg %in% c("SinLinea"), -0.0858, 0)))
+# linea_activa_var1m3
+data_train$linea_activa_var1m3_woe = ifelse( is.na(data_train$linea_total_max1m3_flg), -0.0602,
+      ifelse(data_train$linea_activa_var1m3 %in% c("Cero linea_activa", "Menor linea_activa"), -0.0602,
+      ifelse(data_train$linea_activa_var1m3 %in% c("Igual linea_activa", "Mayor linea_activa"), 0.4112, 0)))
+data_test$linea_activa_var1m3_woe = ifelse( is.na(data_test$linea_total_max1m3_flg), -0.0602,
+      ifelse(data_test$linea_activa_var1m3 %in% c("Cero linea_activa", "Menor linea_activa"), -0.0602,
+      ifelse(data_test$linea_activa_var1m3 %in% c("Igual linea_activa", "Mayor linea_activa"), 0.4112, 0)))
+
+data_train_cat_woe = data_train
+data_test_cat_woe = data_test
+
+#######################################################################################################################
+
+data_train = cbind(X_train_num[, var_num], y_train)
+
+data_train[, 'tm'] = data_train$malo
+data_train[, 'malo'] = as.factor(data_train$malo)
+
+data_test = cbind(X_test_num[, var_num], y_test)
+
+data_test[, 'tm'] = data_test$malo
+data_test[, 'malo'] = as.factor(data_test$malo)
+
+# transformacion
+data_train[,'edad'] = as.numeric(X_train_num[,'edad'])
+data_train[,'frec_mora60_1m12'] = as.numeric(X_train_num[,'frec_mora60_1m12'])
+data_train[,'frec_calificacion_0_1m12'] = as.numeric(X_train_num[,'frec_calificacion_0_1m12'])
+data_train[,'frec_por_cal0_100_1m12'] = as.numeric(X_train_num[,'frec_por_cal0_100_1m12'])
+data_train[,'calificacion_max1m12'] = as.character(X_train_num[,'calificacion_max1m12'])
+data_train[,'frec_mora30_1m12'] = as.numeric(X_train_num[,'frec_mora30_1m12'])
+#
+data_test[,'edad'] = as.numeric(X_test_num[,'edad'])
+data_test[,'frec_mora60_1m12'] = as.numeric(X_test_num[,'frec_mora60_1m12'])
+data_test[,'frec_calificacion_0_1m12'] = as.numeric(X_test_num[,'frec_calificacion_0_1m12'])
+data_test[,'frec_por_cal0_100_1m12'] = as.numeric(X_test_num[,'frec_por_cal0_100_1m12'])
+data_test[,'calificacion_max1m12'] = as.character(X_test_num[,'calificacion_max1m12'])
+data_test[,'frec_mora30_1m12'] = as.numeric(X_test_num[,'frec_mora30_1m12'])
+
+# imputacion
+data_train$cuota[is.na(data_train$cuota)] = median(X_train_num$cuota, na.rm = T) # 1348.865
+data_train$ci_pv[is.na(data_train$ci_pv)] = median(X_train_num$ci_pv, na.rm = T) # 0.03529931
+#
+data_test$cuota[is.na(data_test$cuota)] = 1348.865
+data_test$ci_pv[is.na(data_test$ci_pv)] = 0.03529931
+
+
+########################################################################
+
+# linea_activa_max1m12
+data_train$linea_activa_max1m12_woe = ifelse( is.na(data_train$linea_activa_max1m12), -0.0848,
+      ifelse(data_train$linea_activa_max1m12 <= 1500, 0.0327, 
+      ifelse(data_train$linea_activa_max1m12 > 1500, 0.5631, 0)))
+data_test$linea_activa_max1m12_woe = ifelse( is.na(data_test$linea_activa_max1m12), -0.0848,
+      ifelse(data_test$linea_activa_max1m12 <= 1500, 0.0327, 
+      ifelse(data_test$linea_activa_max1m12 > 1500, 0.5631, 0)))
+# por_mora_0_min1m12
+data_train$por_mora_0_min1m12_woe = ifelse( is.na(data_train$por_mora_0_min1m12), 0.0273,
+      ifelse(data_train$por_mora_0_min1m12 <= 0, -0.1460, 
+      ifelse(data_train$por_mora_0_min1m12 > 0, 0.3455, 0)))
+data_test$por_mora_0_min1m12_woe = ifelse( is.na(data_test$por_mora_0_min1m12), 0.0273,
+      ifelse(data_test$por_mora_0_min1m12 <= 0, -0.1460, 
+      ifelse(data_test$por_mora_0_min1m12 > 0, 0.3455, 0)))
+# linea_total_max1m12
+data_train$linea_total_max1m12_woe = ifelse( is.na(data_train$linea_total_max1m12), -0.0882,
+      ifelse(data_train$linea_total_max1m12 <= 1800, 0.0474, 
+      ifelse(data_train$linea_total_max1m12 > 1800, 0.6232, 0)))
+data_test$linea_total_max1m12_woe = ifelse( is.na(data_test$linea_total_max1m12), -0.0882,
+      ifelse(data_test$linea_total_max1m12 <= 1800, 0.0474, 
+      ifelse(data_test$linea_total_max1m12 > 1800, 0.6232, 0)))
+# por_uso_linea_max1m12
+data_train$por_uso_linea_max1m12_woe = ifelse( is.na(data_train$por_uso_linea_max1m12), -0.0882,
+      ifelse(data_train$por_uso_linea_max1m12 <= 0.997, 0.3831, 
+      ifelse(data_train$por_uso_linea_max1m12 > 0.997, 0.1660, 0)))
+data_test$por_uso_linea_max1m12_woe = ifelse( is.na(data_test$por_uso_linea_max1m12), -0.0882,
+      ifelse(data_test$por_uso_linea_max1m12 <= 0.997, 0.3831, 
+      ifelse(data_test$por_uso_linea_max1m12 > 0.997, 0.1660, 0)))
+# por_mora_0_min1m3
+data_train$por_mora_0_min1m3_woe = ifelse( is.na(data_train$por_mora_0_min1m3), 0.0177,
+      ifelse(data_train$por_mora_0_min1m3 <= 0, -0.2050, 
+      ifelse(data_train$por_mora_0_min1m3 > 0, 0.3766, 0)))
+data_test$por_mora_0_min1m3_woe = ifelse( is.na(data_test$por_mora_0_min1m3), 0.0177,
+      ifelse(data_test$por_mora_0_min1m3 <= 0, -0.2050, 
+      ifelse(data_test$por_mora_0_min1m3 > 0, 0.3766, 0)))
+# por_uso_linea_max1m3
+data_train$por_uso_linea_max1m3_woe = ifelse( is.na(data_train$por_uso_linea_max1m3), -0.0858,
+      ifelse(data_train$por_uso_linea_max1m3 <= 0.842, 0.6298, 
+      ifelse(data_train$por_uso_linea_max1m3 > 0.842, 0.0872, 0)))
+data_test$por_uso_linea_max1m3_woe = ifelse( is.na(data_test$por_uso_linea_max1m3), -0.0858,
+      ifelse(data_test$por_uso_linea_max1m3 <= 0.842, 0.6298, 
+      ifelse(data_test$por_uso_linea_max1m3 > 0.842, 0.0872, 0)))
+# por_mora_0_min1m6
+data_train$por_mora_0_min1m6_woe = ifelse( is.na(data_train$por_mora_0_min1m6), 0.0149,
+      ifelse(data_train$por_mora_0_min1m6 <= 0, -0.1904, 
+      ifelse(data_train$por_mora_0_min1m6 > 0, 0.4010, 0)))
+data_test$por_mora_0_min1m6_woe = ifelse( is.na(data_test$por_mora_0_min1m6), 0.0149,
+      ifelse(data_test$por_mora_0_min1m6 <= 0, -0.1904, 
+      ifelse(data_test$por_mora_0_min1m6 > 0, 0.4010, 0)))
+# linea_activa_max1m6
+data_train$linea_activa_max1m6_woe = ifelse( is.na(data_train$linea_activa_max1m6), -0.0818,
+      ifelse(data_train$linea_activa_max1m6 <= 1000, -0.0729, 
+      ifelse(data_train$linea_activa_max1m6 > 1000, 0.6160, 0)))
+data_test$linea_activa_max1m6_woe = ifelse( is.na(data_test$linea_activa_max1m6), -0.0818,
+      ifelse(data_test$linea_activa_max1m6 <= 1000, -0.0729, 
+      ifelse(data_test$linea_activa_max1m6 > 1000, 0.6160, 0)))
+# linea_total_max1m6
+data_train$linea_total_max1m6_woe = ifelse( is.na(data_train$linea_total_max1m6), -0.0888,
+      ifelse(data_train$linea_total_max1m6 <= 1500, 0.1157, 
+      ifelse(data_train$linea_total_max1m6 > 1500, 0.5989, 0)))
+data_test$linea_total_max1m6_woe = ifelse( is.na(data_test$linea_total_max1m6), -0.0888,
+      ifelse(data_test$linea_total_max1m6 <= 1500, 0.1157, 
+      ifelse(data_test$linea_total_max1m6 > 1500, 0.5989, 0)))
+# linea_activa_max1m3
+data_train$linea_activa_max1m3_woe = ifelse( is.na(data_train$linea_activa_max1m3), -0.0803,
+      ifelse(data_train$linea_activa_max1m3 <= 1000, -0.0633, 
+      ifelse(data_train$linea_activa_max1m3 > 1000, 0.6536, 0)))
+data_test$linea_activa_max1m3_woe = ifelse( is.na(data_test$linea_activa_max1m3), -0.0803,
+      ifelse(data_test$linea_activa_max1m3 <= 1000, -0.0633, 
+      ifelse(data_test$linea_activa_max1m3 > 1000, 0.6536, 0)))
+# linea_total_max1m3
+data_train$linea_total_max1m3_woe = ifelse( is.na(data_train$linea_total_max1m3), -0.0858,
+      ifelse(data_train$linea_total_max1m3 <= 2300, 0.1736, 
+      ifelse(data_train$linea_total_max1m3 > 2300, 0.7083, 0)))
+data_test$linea_total_max1m3_woe = ifelse( is.na(data_test$linea_total_max1m3), -0.0858,
+      ifelse(data_test$linea_total_max1m3 <= 2300, 0.1736, 
+      ifelse(data_test$linea_total_max1m3 > 2300, 0.7083, 0)))
+# frec_calificacion_0_1m12
+data_train$frec_calificacion_0_1m12_woe = ifelse( is.na(data_train$frec_calificacion_0_1m12), -0.0527,
+      ifelse(data_train$frec_calificacion_0_1m12 <= 11, -0.0527, 
+      ifelse(data_train$frec_calificacion_0_1m12 > 11, 0.4846, 0)))
+data_test$frec_calificacion_0_1m12_woe = ifelse( is.na(data_test$frec_calificacion_0_1m12), -0.0527,
+      ifelse(data_test$frec_calificacion_0_1m12 <= 11, -0.0527, 
+      ifelse(data_test$frec_calificacion_0_1m12 > 11, 0.4846, 0)))
+# por_uso_linea_1m
+data_train$por_uso_linea_1m_woe = ifelse( is.na(data_train$por_uso_linea_1m), -0.0932,
+      ifelse(data_train$por_uso_linea_1m <= 0.5, 0.5757, 
+      ifelse(data_train$por_uso_linea_1m > 0.5, 0.3685, 0)))
+data_test$frec_calificacion_0_1m12_woe = ifelse( is.na(data_test$por_uso_linea_1m), -0.0932,
+      ifelse(data_test$por_uso_linea_1m <= 0.5, 0.5757, 
+      ifelse(data_test$por_uso_linea_1m > 0.5, 0.3685, 0)))
+# por_uso_linea_max1m6
+data_train$por_uso_linea_max1m6_woe = ifelse( is.na(data_train$por_uso_linea_max1m6), -0.0888,
+      ifelse(data_train$por_uso_linea_max1m6 <= 0.959, 0.4863,
+      ifelse(data_train$por_uso_linea_max1m6 > 0.959, 0.1574, 0)))
+data_test$frec_calificacion_0_1m12_woe = ifelse( is.na(data_test$por_uso_linea_max1m6), -0.0888,
+      ifelse(data_test$por_uso_linea_max1m6 <= 0.959, 0.4863,
+      ifelse(data_test$por_uso_linea_max1m6 > 0.959, 0.1574, 0)))
+# edad
+data_train$edad_woe = ifelse( is.na(data_train$edad), -0.1814,
+      ifelse(data_train$edad <= 34, -0.1814, 
+      ifelse(data_train$edad <= 40, 0.0540,
+      ifelse(data_train$edad <= 46, 0.1024,
+      ifelse(data_train$edad <= 56, 0.3128,
+      ifelse(data_train$edad > 56, 0.5628, 0))))))
+data_test$edad_woe = ifelse( is.na(data_test$edad), -0.1814,
+      ifelse(data_test$edad <= 34, -0.1814, 
+      ifelse(data_test$edad <= 40, 0.0540,
+      ifelse(data_test$edad <= 46, 0.1024,
+      ifelse(data_test$edad <= 56, 0.3128,
+      ifelse(data_test$edad > 56, 0.5628, 0))))))
+# # ci_pv
+# data_train$ci_pv_woe = ifelse( is.na(data_train$ci_pv), -0.4322,
+#       ifelse(data_train$ci_pv <= 0.025, -0.4322, 
+#       ifelse(data_train$ci_pv <= 0.05, 0.0390, 
+#       ifelse(data_train$ci_pv > 0.05, 0.3813, 0))))
+# data_test$ci_pv_woe = ifelse( is.na(data_test$ci_pv), -0.4322,
+#       ifelse(data_test$ci_pv <= 0.025, -0.4322, 
+#       ifelse(data_test$ci_pv <= 0.05, 0.0390, 
+#       ifelse(data_test$ci_pv > 0.05, 0.3813, 0))))
+
+# # cuota
+# data_train$cuota_woe = ifelse( is.na(data_train$cuota), 0.5290,
+#       ifelse(data_train$cuota <= 1034.67, 0.2150, 
+#       ifelse(data_train$cuota <= 1316.3875, -0.0054, 
+#       ifelse(data_train$cuota <= 1381, -0.1660, 
+#       ifelse(data_train$cuota > 1381, -0.2307, 0)))))
+# data_test$cuota_woe = ifelse( is.na(data_test$cuota), 0.5290,
+#       ifelse(data_test$cuota <= 1034.67, 0.2150, 
+#       ifelse(data_test$cuota <= 1316.3875, -0.0054,
+#       ifelse(data_test$cuota <= 1381, -0.1660,
+#       ifelse(data_test$cuota > 1381, -0.2307, 0)))))
+# linea_total_1m
+data_train$linea_total_1m_woe = ifelse( is.na(data_train$linea_total_1m), -0.0932, 0.4583)
+data_test$linea_total_1m_woe = ifelse( is.na(data_test$linea_total_1m), -0.0932, 0.4583)
+# linea_activa_1m
+data_train$linea_activa_1m_woe = ifelse( is.na(data_train$linea_activa_1m), -0.0907, 0.4530)
+data_test$linea_activa_1m_woe = ifelse( is.na(data_test$linea_activa_1m), -0.0907, 0.4530)
+
+data_train_num_woe = data_train
+data_test_num_woe = data_test
+
+data_train_woe = cbind(data_train_num_woe,data_train_cat_woe)
+data_test_woe = cbind(data_test_num_woe,data_test_cat_woe)
+
+```
