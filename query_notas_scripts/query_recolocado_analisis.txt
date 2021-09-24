@@ -1,0 +1,217 @@
+select
+	-- eje
+	a.cosecha, a.cv, a.co, a.expediente, a.producto,
+	-- tm y filtro
+	case when (
+		case
+            when a.cosecha<=201810 
+            and a.cosecha <= to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                            b.fec_incauta, b.fec_captura, b.fec_recoloc, b.fec_castigo), 'YYYYMM')::numeric
+                        and to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                            b.fec_incauta, b.fec_captura, b.fec_recoloc,
+                            b.fec_castigo), 'YYYYMM')::numeric <= to_char( to_date( a.cosecha::text,
+                                'YYYYMM') + interval'16 months','YYYYMM')::numeric
+                    then 1
+
+            when 
+            a.cosecha>=201811
+            and a.cosecha <= to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                            b.fec_incauta, b.fec_captura, b.fec_recoloc, b.fec_castigo), 'YYYYMM')::numeric
+                        and to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                            b.fec_incauta, b.fec_captura, b.fec_recoloc,
+                            b.fec_castigo), 'YYYYMM')::numeric <= to_char( to_date( a.cosecha::text,
+                                'YYYYMM') + interval'24 months','YYYYMM')::numeric
+                    then 1
+
+            else 0 end
+	) = 1
+	or
+	(case when
+		greatest(c.mes1, c.mes2, c.mes3, c.mes4, c.mes5, c.mes6, c.mes7, c.mes8,
+			c.mes9, c.mes10, c.mes11, c.mes12, c.mes13, c.mes14, c.mes15, c.mes16) > 60
+	 then 1 else 0 end
+	) = 1
+	then 1 else 0 end malo, -- 16m
+	case when 
+		(case when (
+            case
+                when a.cosecha<=201810 
+                and a.cosecha <= to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                                b.fec_incauta, b.fec_captura, b.fec_recoloc, b.fec_castigo), 'YYYYMM')::numeric
+                            and to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                                b.fec_incauta, b.fec_captura, b.fec_recoloc,
+                                b.fec_castigo), 'YYYYMM')::numeric <= to_char( to_date( a.cosecha::text,
+                                    'YYYYMM') + interval'16 months','YYYYMM')::numeric
+                        then 1
+
+                when 
+                a.cosecha>=201811
+                and a.cosecha <= to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                                b.fec_incauta, b.fec_captura, b.fec_recoloc, b.fec_castigo), 'YYYYMM')::numeric
+                            and to_char( least( b.fec_recuperacion, b.fec_adjudic, 
+                                b.fec_incauta, b.fec_captura, b.fec_recoloc,
+                                b.fec_castigo), 'YYYYMM')::numeric <= to_char( to_date( a.cosecha::text,
+                                    'YYYYMM') + interval'24 months','YYYYMM')::numeric
+                        then 1
+
+                else 0 end
+		) = 1
+		or
+		(case when
+			greatest(c.mes1, c.mes2, c.mes3, c.mes4, c.mes5, c.mes6, c.mes7, c.mes8,
+				c.mes9, c.mes10, c.mes11, c.mes12, c.mes13, c.mes14, c.mes15, c.mes16) > 60
+		then 1 else 0 end
+		) = 1
+		then 1 else 0 end) = 0
+		and 
+		(
+			case when c.mes1 > 30 and c.mes1 <= 60 then 1 else 0 end +
+			case when c.mes2 > 30 and c.mes2 <= 60 then 1 else 0 end +
+			case when c.mes3 > 30 and c.mes3 <= 60 then 1 else 0 end +
+			case when c.mes4 > 30 and c.mes4 <= 60 then 1 else 0 end +
+			case when c.mes5 > 30 and c.mes5 <= 60 then 1 else 0 end +
+			case when c.mes6 > 30 and c.mes6 <= 60 then 1 else 0 end +
+			case when c.mes7 > 30 and c.mes7 <= 60 then 1 else 0 end +
+			case when c.mes8 > 30 and c.mes8 <= 60 then 1 else 0 end +
+			case when c.mes9 > 30 and c.mes9 <= 60 then 1 else 0 end +
+			case when c.mes10 > 30 and c.mes10 <= 60 then 1 else 0 end +
+			case when c.mes11 > 30 and c.mes11 <= 60 then 1 else 0 end +
+			case when c.mes12 > 30 and c.mes12 <= 60 then 1 else 0 end +
+			case when c.mes13 > 30 and c.mes13 <= 60 then 1 else 0 end +
+			case when c.mes14 > 30 and c.mes14 <= 60 then 1 else 0 end +
+			case when c.mes15 > 30 and c.mes15 <= 60 then 1 else 0 end +
+			case when c.mes16 > 30 and c.mes16 <= 60 then 1 else 0 end
+		) >= 2
+	then 1 else 0 end indeterminado,
+	case when
+		(
+			case when c.mes1 >= 0 then 1 else 0 end +
+			case when c.mes2 >= 0 then 1 else 0 end +
+			case when c.mes3 >= 0 then 1 else 0 end +
+			case when c.mes4 >= 0 then 1 else 0 end +
+			case when c.mes5 >= 0 then 1 else 0 end +
+			case when c.mes6 >= 0 then 1 else 0 end +
+			case when c.mes7 >= 0 then 1 else 0 end +
+			case when c.mes8 >= 0 then 1 else 0 end +
+			case when c.mes9 >= 0 then 1 else 0 end +
+			case when c.mes10 >= 0 then 1 else 0 end +
+			case when c.mes11 >= 0 then 1 else 0 end +
+			case when c.mes12 >= 0 then 1 else 0 end +
+			case when c.mes13 >= 0 then 1 else 0 end +
+			case when c.mes14 >= 0 then 1 else 0 end +
+			case when c.mes15 >= 0 then 1 else 0 end +
+			case when c.mes16 >= 0 then 1 else 0 end
+		) < 6
+	then 1 else 0 end insuficiente,
+	/* demograficas */
+    d.edad, d.perfil, d.estado_civil,
+	---d.educacion, , d.vivienda,  d.carga_fam,	d.ingreso,
+	/* internas */
+	e.maf, e.ci, e.cuota, e.marca, e.pv, e.antiguedad,
+	---e.cuotas_pend, e.cuotas_canc, e.saldo_cap, e.saldo_int, e.saldo_mora,
+    ---e.provision, e.garpref,	e.cap_vig, e.cap_ref, e.cap_ven, e.cap_jud,	e.mora_prom1m6,	
+    ---e.mora,	e.calificacion_conalin,	e.calificacion_sinalin,	e.sobreend,	e.riesgocc,	
+    ---e.refin, e.refinanciacion, e.im_pagcof,	e.carga_gnv, e.nro_carga_gnv, e.cv_carga_gnv,	
+    ---e.relacion_im_pagcof_cuota,	e.relacion_carga_gnv_cuota, 
+	/* rcc */
+	f.calificacion_max1m12, f.saldo_max1m12, f.mora_max1m12, f.saldo_castigo_max1m12,
+    f.linea_activa_max1m12, f.por_uso_linea_max1m12, f.expcred_1m12, 
+    f.frec_por_cal0_100_1m12, f.frec_por_cal4_100_1m12, 
+    f.rec_por_cal0_100_1m12, f.rec_por_cal4_100_1m12
+	
+	/*
+	f.por_cal0_min1m12, f.saldo_cal4_max1m12, f.por_cal4_max1m12, f.saldo_cal34_max1m12,
+    f.por_cal34_max1m12, f.saldo_cal234_max1m12, f.por_cal234_max1m12, 
+    f.saldo_cal1234_max1m12, f.por_cal1234_max1m12,
+	f.saldo_mora90_max1m12, f.por_mora90_max1m12, 
+    f.saldo_mora60_max1m12, f.por_mora60_max1m12, f.saldo_mora30_max1m12, 
+    f.por_mora30_max1m12, f.saldo_mora0_max1m12, f.por_mora0_max1m12, f.por_mora_0_min1m12,	
+    f.por_vig_min1m12, f.saldo_novig_max1m12, f.por_novig_max1m12, 
+	f.por_castigo_max1m12, f.linea_total_max1m12,
+    f.linea_usada_max1m12, f.disp_efectivo_max1m12, 
+    f.por_uso_efectivo_max1m12, f.saldo_me_max1m12, f.por_me_max1m12,
+	f.cv_saldo_1m12, f.frec_calificacion_0_1m12, f.frec_calificacion_4_1m12, f.frec_calificacion_34_1m12, 
+    f.frec_calificacion_234_1m12, f.frec_calificacion_1234_1m12, f.frec_mora_0_1m12,
+    f.frec_mora0_1m12, f.frec_mora30_1m12, f.frec_mora60_1m12, f.frec_mora90_1m12, 
+    f.frec_mora120_1m12, f.rec_calificacion_0_1m12, f.rec_calificacion_4_1m12, f.rec_calificacion_34_1m12, 
+    f.rec_calificacion_234_1m12, f.rec_calificacion_1234_1m12, f.rec_mora_0_1m12, 
+    f.rec_mora0_1m12, f.rec_mora30_1m12, f.rec_mora60_1m12, f.rec_mora90_1m12, 
+    f.rec_mora120_1m12
+	
+	f.can_emp_1m, f.cm_1m, f.por_cal0_1m, f.saldo_cal4_1m, f.por_cal4_1m, f.saldo_cal34_1m,	
+    f.por_cal34_1m, f.saldo_cal234_1m, f.por_cal234_1m, f.saldo_cal1234_1m, 
+    f.por_cal1234_1m, f.calificacion_1m, f.saldo_1m, f.mora_1m, f.saldo_mora90_1m,
+    f.por_mora90_1m, f.saldo_mora60_1m, f.por_mora60_1m, f.saldo_mora30_1m,	
+    f.por_mora30_1m, f.saldo_mora0_1m, f.por_mora0_1m, f.por_mora_0_1m,	f.por_vig_1m, 
+    f.saldo_novig_1m, f.por_novig_1m, f.saldo_castigo_1m, f.por_castigo_1m,	
+    f.linea_activa_1m, f.linea_total_1m, f.linea_usada_1m, f.por_uso_linea_1m, 
+    f.disp_efectivo_1m, f.por_uso_efectivo_1m, f.saldo_me_1m, f.por_me_1m, 
+    f.por_cal0_min1m3, f.saldo_cal4_max1m3,	f.por_cal4_max1m3, f.saldo_cal34_max1m3, 
+    f.por_cal34_max1m3, f.saldo_cal234_max1m3, f.por_cal234_max1m3, f.saldo_cal1234_max1m3,
+    f.por_cal1234_max1m3, f.calificacion_max1m3, f.saldo_max1m3, f.mora_max1m3, 
+    f.saldo_mora90_max1m3, f.por_mora90_max1m3, f.saldo_mora60_max1m3, f.por_mora60_max1m3,	
+    f.saldo_mora30_max1m3, f.por_mora30_max1m3, f.saldo_mora0_max1m3, f.por_mora0_max1m3, 
+    f.por_mora_0_min1m3, f.por_vig_min1m3, f.saldo_novig_max1m3, f.por_novig_max1m3, 
+    f.saldo_castigo_max1m3, f.por_castigo_max1m3, f.linea_activa_max1m3,
+    f.linea_total_max1m3, f.linea_usada_max1m3, f.por_uso_linea_max1m3, 
+    f.disp_efectivo_max1m3, f.por_uso_efectivo_max1m3, f.saldo_me_max1m3, f.por_me_max1m3, 
+    f.por_cal0_min1m6, f.saldo_cal4_max1m6, f.por_cal4_max1m6, f.saldo_cal34_max1m6, 
+    f.por_cal34_max1m6, f.saldo_cal234_max1m6, f.por_cal234_max1m6, f.saldo_cal1234_max1m6, 
+    f.por_cal1234_max1m6, f.calificacion_max1m6, f.saldo_max1m6, f.mora_max1m6, 
+    f.saldo_mora90_max1m6, f.por_mora90_max1m6, f.saldo_mora60_max1m6, f.por_mora60_max1m6,
+    f.saldo_mora30_max1m6, f.por_mora30_max1m6, f.saldo_mora0_max1m6, f.por_mora0_max1m6, 
+    f.por_mora_0_min1m6, f.por_vig_min1m6, f.saldo_novig_max1m6, f.por_novig_max1m6, 
+    f.saldo_castigo_max1m6, f.por_castigo_max1m6, f.linea_activa_max1m6, 
+    f.linea_total_max1m6, f.linea_usada_max1m6, f.por_uso_linea_max1m6,	
+    f.disp_efectivo_max1m6, f.por_uso_efectivo_max1m6, f.saldo_me_max1m6, f.por_me_max1m6,
+    f.can_emp_var1m3, f.can_emp_var1m6, f.can_emp_var1m12,	
+    f.por_cal0_var1m3, f.por_cal0_var1m6, f.por_cal0_var1m12, f.por_cal4_var1m3, 
+    f.por_cal4_var1m6, f.por_cal4_var1m12, f.por_cal34_var1m3, f.por_cal34_var1m6, 
+    f.por_cal34_var1m12, f.por_cal234_var1m3, f.por_cal234_var1m6, f.por_cal234_var1m12, 
+    f.por_cal1234_var1m3, f.por_cal1234_var1m6, f.por_cal1234_var1m12, 
+    f.calificacion_var1m3, f.calificacion_var1m6, f.calificacion_var1m12, f.saldo_var1m3, 
+    f.saldo_var1m6, f.saldo_var1m12, f.mora_var1m3, f.mora_var1m6, f.mora_var1m12, 
+    f.por_mora90_var1m3, f.por_mora90_var1m6, f.por_mora90_var1m12, f.por_mora60_var1m3,
+    f.por_mora60_var1m6, f.por_mora60_var1m12, f.por_mora30_var1m3, f.por_mora30_var1m6, 
+    f.por_mora30_var1m12, f.por_mora0_var1m3, f.por_mora0_var1m6, f.por_mora0_var1m12, 
+    f.por_mora_0_var1m3, f.por_mora_0_var1m6, f.por_mora_0_var1m12, f.por_vig_var1m3, 
+    f.por_vig_var1m6, f.por_vig_var1m12, f.por_novig_var1m3, f.por_novig_var1m6,
+    f.por_novig_var1m12, f.por_castigo_var1m3, f.por_castigo_var1m6, 
+    f.por_castigo_var1m12, f.linea_activa_var1m3, f.linea_activa_var1m6, 
+    f.linea_activa_var1m12, f.por_uso_linea_var1m3, f.por_uso_linea_var1m6, 
+    f.por_uso_linea_var1m12, f.por_uso_efectivo_var1m3, f.por_uso_efectivo_var1m6, 
+    f.por_uso_efectivo_var1m12, f.por_me_var1m3, f.por_me_var1m6, f.por_me_var1m12, 
+    f.can_emp_1m_max2m12, f.can_emp_max1m3_max4m12, f.can_emp_max1m6_max7m12, 
+    f.por_cal0_1m_min2m12, f.por_cal0_min1m3_min4m12, f.por_cal0_min1m6_min7m12, 
+    f.por_cal4_1m_max2m12, f.por_cal4_max1m3_max4m12, f.por_cal4_max1m6_max7m12,	
+    f.por_cal34_1m_max2m12, f.por_cal34_max1m3_max4m12, f.por_cal34_max1m6_max7m12, 
+    f.por_cal234_1m_max2m12, f.por_cal234_max1m3_max4m12, f.por_cal234_max1m6_max7m12, 
+    f.por_cal1234_1m_max2m12, f.por_cal1234_max1m3_max4m12, f.por_cal1234_max1m6_max7m12,
+    f.calificacion_1m_max2m12, f.calificacion_max1m3_max4m12, 
+    f.calificacion_max1m6_max7m12, f.saldo_1m_max2m12, f.saldo_max1m3_max4m12,	
+    f.saldo_max1m6_max7m12, f.mora_1m_max2m12, f.mora_max1m3_max4m12, 
+    f.mora_max1m6_max7m12, f.por_mora90_1m_max2m12, f.por_mora90_max1m3_max4m12, 
+    f.por_mora90_max1m6_max7m12, f.por_mora60_1m_max2m12, f.por_mora60_max1m3_max4m12,
+    f.por_mora60_max1m6_max7m12, f.por_mora30_1m_max2m12, f.por_mora30_max1m3_max4m12, 
+    f.por_mora30_max1m6_max7m12, f.por_mora0_1m_max2m12, f.por_mora0_max1m3_max4m12, 
+    f.por_mora0_max1m6_max7m12, f.por_mora_0_1m_min2m12, f.por_mora_0_min1m3_min4m12, 
+    f.por_mora_0_min1m6_min7m12, f.por_vig_1m_min2m12, f.por_vig_min1m3_min4m12,
+    f.por_vig_min1m6_min7m12, f.por_novig_1m_max2m12, f.por_novig_max1m3_max4m12, 
+    f.por_novig_max1m6_max7m12, f.por_castigo_1m_max2m12, f.por_castigo_max1m3_max4m12, 
+    f.por_castigo_max1m6_max7m12, f.linea_activa_1m_max2m12, f.linea_activa_max1m3_max4m12,	
+    f.linea_activa_max1m6_max7m12, f.por_uso_linea_1m_max2m12, 
+    f.por_uso_linea_max1m3_max4m12, f.por_uso_linea_max1m6_max7m12,
+    f.por_uso_efectivo_1m_max2m12, f.por_uso_efectivo_max1m3_max4m12, 
+    f.por_uso_efectivo_max1m6_max7m12, f.por_me_1m_max2m12,	
+    f.por_me_max1m3_max4m12, f.por_me_max1m6_max7m12
+	*/
+from admision.cosecha_eje a
+left join comportamiento.cartera_fechas b on a.co = b.co
+left join admision.cosecha_performance_sinrepro c on a.cosecha||a.cv = c.cosecha||c.cv
+left join admision.cosecha_vdemo d on a.cosecha||a.cv = d.cosecha||d.cv
+left join admision.cosecha_vint e on a.cosecha||a.cv = e.cosecha||e.cv
+left join admision.cosecha_vrcc f on a.cosecha||a.cv = f.cosecha||f.cv
+where 
+	a.producto in ('Recolocado', 'Recolocado LD')
+	and a.cosecha >= 201301
+;

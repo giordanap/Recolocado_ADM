@@ -1,0 +1,686 @@
+
+```{r}
+# Limpieza de variables:
+rm(list = ls())
+
+#############################
+####        Rutas        ####
+#############################
+path = 'D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/'
+
+# Librerias a usar ...
+
+library(woeBinning) # Bivariados
+library(funModeling) # Status
+library(MASS) # Stepwise
+library(Hmisc) # Gini
+library(survey) # Wald variable
+library(aod) # Prueba Wald modelo
+library(ResourceSelection) # Prueba Hosmer Lemeshow
+library(dplyr) # Frecuencia de categoricas en el manual
+require(tcltk) # Mensaje de alerta de finalizacion de procesos
+```
+
+
+```{r}
+###############################
+######      Inicio        #####
+###############################
+
+# data = read.table(file.choose(), header = T, sep = ',')
+data = read.csv( paste(path,"bases/construccion/","base_axes_sinRepros_final_3.csv", sep="") , header = T, sep = ',')
+```
+
+```{r}
+writeLines("Dimensiones:")
+dim(data)
+```
+
+```{r}
+colnames(data)[1:15]
+```
+
+```{r}
+writeLines("Presentacion:\n")
+as.matrix(data)[1:2,1:9]
+```
+
+```{r}
+data[, 'filtro'] = ifelse((data$indeterminado + data$insuficiente) == 0, 0, 1)
+data[, 'tm'] = data$malo
+data[, 'malo'] = as.factor(data$malo)
+```
+
+```{r}
+writeClipboard(gsub("\\\\", "/", readClipboard()))
+```
+
+```{r}
+############## ANALISIS DE VARIABLES - CONTEO 0 NA INF
+data_sts=df_status(data)
+# write.table(data_sts,paste(readline(),"data_sts.csv",sep="\\"), sep=',')
+write.table(data_sts,paste(path,"analisis/","data_sts.csv", sep=""), sep = ',')
+```
+
+```{r}
+############## ANALISIS DE VARIABLES - ESTADISTICOS
+data_anls=profiling_num(data)
+# write.table(data_anls,paste(readline(),"data_anls.csv",sep="\\"), sep=',')
+write.table(data_anls,paste(path,"analisis/","data_anls.csv", sep=""), sep = ',')
+```
+
+```{r}
+# Cargamos la data del Python:
+# X_train_num = read.csv("D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/bases/train_test/X_train_num.csv", header = T, sep = ',')
+# X_train_cat = read.table("D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/bases/train_test/X_train_cat.csv", header = T, sep = ',')
+# X_test_num = read.table("D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/bases/train_test/X_test_num.csv", header = T, sep = ',')
+# X_test_cat = read.table("D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/bases/train_test/X_test_cat.csv", header = T, sep = ',')
+# y_train = read.table("D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/bases/train_test/y_train.csv", header = T, sep = ',')
+# y_test = read.table("D:/GIAP/Curvas_PE/Recolocado/calibracion/202108/Recolocado_ADM/bases/train_test/y_test.csv", header = T, sep = ',')
+
+X_train_num = read.csv( paste(path,"bases/train_test/","X_train_num.csv", sep="") , header = T, sep = ',')
+X_train_cat = read.csv( paste(path,"bases/train_test/","X_train_cat.csv", sep="") , header = T, sep = ',')
+X_test_num = read.csv( paste(path,"bases/train_test/","X_test_num.csv", sep="") , header = T, sep = ',')
+X_test_cat = read.csv( paste(path,"bases/train_test/","X_test_cat.csv", sep="") , header = T, sep = ',')
+y_train = read.csv( paste(path,"bases/train_test/","y_train.csv", sep="") , header = T, sep = ',')
+y_test = read.csv( paste(path,"bases/train_test/","y_test.csv", sep="") , header = T, sep = ',')
+```
+
+```{r}
+rownames(X_train_num) = X_train_num$X; X_train_num$X = NULL
+rownames(X_train_cat) = X_train_cat$X; X_train_cat$X = NULL
+rownames(X_test_num) = X_test_num$X; X_test_num$X = NULL
+rownames(X_test_cat) = X_test_cat$X; X_test_cat$X = NULL
+rownames(y_train) = y_train$X; y_train$X = NULL
+rownames(y_test) = y_test$X; y_test$X = NULL
+```
+
+```{r}
+head(X_train_num, 2)
+```
+
+```{r}
+head(X_train_cat, 2)
+```
+
+```{r}
+dim(X_train_num)
+```
+
+```{r}
+head(X_test_num, 2)
+```
+
+```{r}
+head(X_test_cat, 2)
+```
+
+```{r}
+dim(X_test_num)
+```
+
+```{r}
+y_train[,1][1:25]
+```
+
+```{r}
+mean(y_train$malo)
+```
+
+```{r}
+y_test[,1][1:25]
+```
+
+```{r}
+mean(y_test$malo)
+```
+
+```{r}
+# str(X_train_num)
+```
+
+```{r}
+#################################
+######      woeBinning      #####
+#################################
+```
+
+```{r}
+######  Tratamiento Numericas #####
+```
+
+```{r}
+data_train = X_train_num
+data_test = X_test_num
+
+var_num = colnames(X_train_num)
+
+dim(X_train_num)
+dim(X_test_num)
+
+length(var_num)
+```
+
+```{r}
+# Nulos (criterio 02)
+
+n = length(var_num)
+m_train = dim(data_train)[1]
+m_test = dim(data_test)[1]
+data_na = data.frame("var" = 1:n)
+
+for (i in 1:n) 
+  {
+    data_na[i, 'var'] = var_num[i]
+    data_na[i, 'na_train'] = length(which(is.na( data_train[, var_num[i]] )))/m_train
+    data_na[i, 'na_test'] = length(which(is.na( data_test[, var_num[i]] )))/m_test
+  }
+
+# write.table(data_na,paste(readline(),"na_num.csv",sep="\\"), sep=',')
+write.table(data_na,paste(path,"analisis/","na_num.csv", sep=""), sep = ',')
+
+var_num = setdiff(var_num, as.character( data_na[data_na[, 'na_train'] > 0.8, 'var'] ) )
+
+length(var_num)
+```
+
+```{r}
+# CV (criterio 03) # aplicado a variables numericas
+
+n = length(var_num)
+data_cv = data.frame("var" = 1:n)
+
+for (i in 1:n) {
+  data_cv[i, 'var'] = var_num[i]
+  data_cv[i, 'cv_train'] = sd(data_train[, var_num[i]], na.rm=T) / mean(data_train[, var_num[i]], na.rm=T)
+  data_cv[i, 'cv_test'] = sd(data_test[, var_num[i]], na.rm=T) / mean(data_test[, var_num[i]], na.rm=T)
+}
+
+# write.table(data_cv,paste(readline(),"cv_num.csv",sep="\\"), sep=',')
+write.table(data_cv,paste(path,"analisis/","cv_num.csv", sep=""), sep = ',')
+
+var_num = setdiff(var_num, as.character( data_cv[data_cv[, 'cv_train'] <= 0.2, 'var'] ) )
+
+length(var_num)
+```
+
+```{r}
+# IV Train (criterio 01)
+
+# start_time = as.numeric(Sys.time())
+
+data_woeBinning_train = woe.binning(cbind(data_train[, var_num], y_train), "malo", var_num, min.perc.total=0.05)
+data_woeBinning_test = woe.binning(cbind(data_test[, var_num], y_test), "malo", var_num, min.perc.total=0.05)
+
+
+n = dim( data_woeBinning_train )[1]
+data_wbng_train = data.frame( "var" = 1:n )
+data_wbng_test = data.frame( "var" = 1:n )
+
+for (i in 1:n ) {
+
+    data_wbng_train[i, 'var'] = data_woeBinning_train[,1][[i]]
+    data_wbng_train[i, 'iv_train'] = data_woeBinning_train[,3][[i]]
+
+    data_wbng_test[i, 'var'] = data_woeBinning_test[,1][[i]]
+    data_wbng_test[i, 'iv_test'] = data_woeBinning_test[,3][[i]]
+
+}
+
+data_wbng = merge( data_wbng_train, data_wbng_test, by=c("var"))
+data_wbng = data_wbng[order(-data_wbng$iv_train),]
+row.names(data_wbng) <- NULL
+
+# time_process('Lista de woeBinning', start_time)
+
+# write.table(data_wbng,paste(readline(),"data_wbng_num.csv",sep="\\"), sep=',')
+write.table(data_wbng,paste(path,"analisis/","data_wbng_num.csv", sep=""), sep = ',')
+
+# data_wbng = read.table(file.choose(), header = T, sep = ',')
+
+var_num = as.character(data_wbng[data_wbng[,'iv_train'] >= 0.02 & data_wbng[,'iv_test'] < 0.5,]$var)
+
+length(var_num)
+```
+
+```{r warning = FALSE}
+# Correlacion
+n = length(var_num)
+k = n * (n-1) / 2
+data_cor = data.frame( "var" = 1:k )
+r = 1
+
+
+# start_time = as.numeric(Sys.time())
+
+for (i in 1:(n-1)) {
+  
+  for (j in (i+1):n ) { 
+    
+    x = data_train[, var_num[i]]
+    y = data_train[, var_num[j]]
+    
+    data_cor[r, 'var'] = var_num[i]
+    data_cor[r, 'var_2'] = var_num[j]
+    data_cor[r, 'cor'] = round( cor(x, y, use='pairwise.complete.obs' ), 4 )
+    
+    r = r + 1
+  }
+  
+}
+
+# time_process('correlacion entre datos', start_time)
+# write.table(data_cor,paste(readline(),"cor_num.csv",sep="\\"), sep=',')
+write.table(data_cor,paste(path,"analisis/","cor_num.csv", sep=""), sep = ',')
+
+var_num = setdiff(var_num, unique( data_cor[abs( data_cor[, 'cor'] ) >= 0.6, 'var_2'] ) )
+
+length(var_num)
+```
+
+```{r}
+var_num = c(
+  # despues de filtros
+  "ci",
+  "saldo_cal4_max1m6",
+  "por_cal34_max1m3",
+  "can_emp_1m",
+  "edad",
+  "saldo_cal1234_max1m3",
+  "disp_efectivo_max1m6",
+  "por_uso_efectivo_max1m6",
+  "por_uso_linea_max1m6",
+  # modelo vigente
+  "linea_total_1m",
+  "frec_mora60_1m12",
+  # IV mayores a 2% en train y test
+  'frec_calificacion_0_1m12',
+  'por_mora_0_min1m6',
+  'por_mora_0_min1m3',
+  'por_vig_min1m3',
+  'por_vig_min1m6',
+  'por_vig_min1m12',
+  'por_mora_0_min1m12',
+  'calificacion_max1m6',
+  'linea_usada_max1m6',
+  'linea_total_max1m6',
+  'disp_efectivo_max1m12',
+  'por_uso_efectivo_max1m12',
+  'linea_activa_max1m6',
+  'linea_total_max1m12',
+  'linea_activa_max1m12',
+  'por_cal0_min1m12'
+  # # ultimo mes
+  # "por_uso_linea_1m",
+  # "mora_1m",
+  # "saldo_1m",
+  # "linea_activa_1m",
+  # 'por_mora_0_1m',
+  # 'por_cal4_1m',
+  # 'por_cal34_1m',
+  # 'por_mora90_1m',
+  # 'saldo_mora90_1m',
+  # 'por_mora60_1m',
+  # 'saldo_mora60_1m',
+  # 'saldo_cal4_1m',
+  # 'saldo_cal34_1m',
+  # 'por_castigo_1m',
+  # 'saldo_castigo_1m',
+  # 'por_vig_1m',
+  # 'por_mora30_1m',
+  # 'saldo_mora30_1m',
+  # 'por_cal234_1m',
+  # 'por_cal0_1m',
+  # 'saldo_cal234_1m',
+  # 'por_cal1234_1m',
+  # 'calificacion_1m',
+  # 'saldo_cal1234_1m',
+  # 'por_mora0_1m',
+  # 'saldo_mora0_1m',
+  # # IV mayor a 2% en train restantes
+  # 'saldo_cal34_max1m3',
+  # 'por_mora90_max1m3',
+  # 'saldo_mora90_max1m3',
+  # 'por_mora60_max1m3',
+  # 'saldo_mora60_max1m3',
+  # 'por_cal4_max1m6',
+  # 'por_mora90_max1m6',
+  # 'saldo_mora90_max1m6',
+  # 'por_mora60_max1m6',
+  # 'saldo_mora60_max1m6',
+  # 'por_cal4_max1m3',
+  # 'frec_por_cal0_100_1m12',
+  # 'saldo_cal4_max1m3',
+  # 'por_mora60_max1m12',
+  # 'saldo_mora60_max1m12',
+  # 'calificacion_max1m12',
+  # 'por_mora90_max1m12',
+  # 'saldo_mora90_max1m12',
+  # 'por_castigo_max1m6',
+  # 'saldo_castigo_max1m6',
+  # 'por_cal0_min1m3',
+  # 'saldo_cal34_max1m6',
+  # 'por_cal4_max1m12',
+  # 'por_castigo_max1m3',
+  # 'saldo_castigo_max1m3',
+  # 'saldo_cal4_max1m12',
+  # 'por_cal34_max1m12',
+  # 'por_cal34_max1m6',
+  # 'saldo_cal34_max1m12',
+  # 'frec_mora_0_1m12',
+  # 'calificacion_max1m3',
+  # 'por_cal234_max1m3',
+  # 'saldo_cal234_max1m3',
+  # 'por_mora30_max1m3',
+  # 'saldo_mora30_max1m3',
+  # 'por_cal0_min1m6',
+  # 'frec_por_cal4_100_1m12',
+  # 'por_castigo_max1m12',
+  # 'saldo_castigo_max1m12',
+  # 'por_mora30_max1m6',
+  # 'saldo_mora30_max1m6',
+  # 'por_cal1234_max1m3',
+  # 'frec_calificacion_4_1m12',
+  # 'saldo_cal234_max1m6',
+  # 'frec_mora90_1m12',
+  # 'frec_mora120_1m12',
+  # 'por_cal234_max1m6',
+  # 'frec_calificacion_34_1m12',
+  # 'por_mora30_max1m12',
+  # 'saldo_mora30_max1m12',
+  # 'frec_mora30_1m12',
+  # 'mora_max1m3',
+  # 'por_mora0_max1m3',
+  # 'saldo_mora0_max1m3',
+  # 'frec_calificacion_1234_1m12',
+  # 'por_cal234_max1m12',
+  # 'frec_mora0_1m12',
+  # 'saldo_cal234_max1m12',
+  # 'frec_calificacion_234_1m12',
+  # 'linea_usada_max1m12',
+  # 'por_uso_linea_max1m12',
+  # 'saldo_cal1234_max1m6',
+  # 'cv_saldo_1m12',
+  # 'por_cal1234_max1m6'
+  # # IV mayor a 2% en test restantes
+)
+
+length(var_num)
+length(unique(var_num))
+```
+
+```{r}
+######  Tratamiento Categoricas #####
+```
+
+```{r}
+data_train = X_train_cat
+data_test = X_test_cat
+
+var_cat = colnames(X_train_cat)
+
+dim(X_train_cat)
+dim(X_test_cat)
+
+length(var_cat)
+```
+
+```{r}
+# Nulos
+
+n = length(var_cat)
+m_train = dim(data_train)[1]
+m_test = dim(data_test)[1]
+data_na = data.frame("var" = 1:n)
+
+for (i in 1:n) 
+  {
+    data_na[i, 'var'] = var_cat[i]
+    data_na[i, 'na_train'] = length(which(is.na( data_train[, var_cat[i]] )))/m_train
+    data_na[i, 'na_test'] = length(which(is.na( data_test[, var_cat[i]] )))/m_test
+  }
+
+# write.table(data_na,paste(readline(),"na_cat.csv",sep="\\"), sep=',')
+write.table(data_na,paste(path,"analisis/","na_cat.csv", sep=""), sep = ',')
+
+var_cat = setdiff(var_cat, as.character( data_na[data_na[, 'na_train'] > 0.80, 'var'] ) )
+
+length(var_cat)
+```
+
+```{r}
+# IV
+
+data_woeBinning_train = woe.binning(cbind(data_train[, var_cat], y_train), "malo", var_cat, min.perc.total=0.05)
+data_woeBinning_test = woe.binning(cbind(data_test[, var_cat], y_test), "malo", var_cat, min.perc.total=0.05)
+
+n = dim( data_woeBinning_train )[1]
+data_wbng_train = data.frame( "var" = 1:n )
+data_wbng_test = data.frame( "var" = 1:n )
+
+for (i in 1:n ) {
+
+    data_wbng_train[i, 'var'] = data_woeBinning_train[,1][[i]]
+    data_wbng_train[i, 'iv_train'] = data_woeBinning_train[,3][[i]]
+
+    data_wbng_test[i, 'var'] = data_woeBinning_test[,1][[i]]
+    data_wbng_test[i, 'iv_test'] = data_woeBinning_test[,3][[i]]
+
+}
+
+data_wbng = merge( data_wbng_train, data_wbng_test, by=c("var"))
+data_wbng = data_wbng[order(-data_wbng$iv_train),]
+row.names(data_wbng) <- NULL
+
+# write.table(data_wbng,paste(readline(),"data_wbng_cat.csv",sep="\\"), sep=',')
+write.table(data_wbng,paste(path,"analisis/","data_wbng_cat.csv", sep=""), sep = ',')
+
+var_num = as.character(data_wbng[data_wbng[,'iv_train'] >= 0.02 & data_wbng[,'iv_test'] < 0.5,]$var)
+
+length(var_cat)
+```
+
+```{r warning=FALSE}
+# # Fisher relacion
+# n = length(var_cat)
+# k = n * (n-1) / 2
+# data_fisher = data.frame("var" = 1:k)
+# r = 1
+# 
+# # start_time = as.numeric(Sys.time())
+# 
+# for (i in 1:(n-1)) {
+#   
+#   for (j in (i+1):n ) { 
+#         
+#     x = data_train[, var_cat[i]]
+#     y = data_train[, var_cat[j]]
+#     
+#     data_fisher[r, 'var'] = var_cat[i]
+#     data_fisher[r, 'var_2'] = var_cat[j]
+#     # data_chisq[r, 'chisq'] = chisq.test( x, y)$p.value
+#     data_fisher[r, 'fisher'] = fisher.test( table(x, y), simulate.p.value=TRUE )$p.value
+#     
+#     r = r + 1
+#   }
+#   
+# }
+# 
+# # time_process('Relacion entre datos categoricos', start_time)
+# 
+# # write.table(data_fisher,paste(readline(),"fisher_cat.csv",sep="\\"), sep=',')
+# write.table(data_fisher,paste(path,"analisis/","fisher_cat.csv", sep=""), sep = ',')
+# 
+# var_cat = setdiff(var_cat, unique( data_fisher[abs( data_fisher[, 'fisher'] ) <= 0.05, 'var_2'] ) )
+# 
+# length(var_cat)
+```
+
+```{r}
+# # Filtro de Negocio, correlacion implicita
+# data_wbng_cat = subset(data_wbng,var %in% var_cat)
+# data_wbng_cat_sort = data_wbng_cat[order(data_wbng_cat$iv, decreasing = TRUE),]
+# 
+# write.table(data_wbng_cat_sort,paste(readline(),"data_wbng_cat_sort.csv",sep="\\"), sep=',')
+# # PATH: D:\GIAP\Curvas_PE\Recolocado\calibracion\202108\Recolocado_ADM\analisis
+```
+
+```{r}
+var_cat = c(
+  # Fisher
+  # rescatamos demosgraficas
+  "marca",
+  "perfil",
+  "estado_civil",
+  # IV mayor a 2% en ambos
+  'calificacion_var1m12',
+  'calificacion_max1m6_max7m12',
+  'calificacion_var1m6',
+  'calificacion_max1m3_max4m12',
+  'calificacion_var1m3',
+  'calificacion_1m_max2m12',
+  'rec_por_cal4_100_1m12',
+  'por_vig_var1m6',
+  'rec_calificacion_0_1m12',
+  'saldo_var1m3',
+  'mora_1m_max2m12',
+  'por_mora_0_min1m6_min7m12',
+  'rec_mora120_1m12',
+  'rec_calificacion_1234_1m12',
+  'rec_calificacion_34_1m12',
+  'rec_mora90_1m12',
+  'rec_calificacion_4_1m12',
+  'rec_mora60_1m12',
+  'rec_calificacion_234_1m12',
+  'disp_efectivo_1m_flg',
+  'linea_total_1m_flg',
+  'linea_usada_1m_flg',
+  'por_mora60_1m_max2m12',
+  'por_mora60_var1m3',
+  'linea_activa_1m_flg',
+  'por_cal4_var1m6',
+  'por_castigo_var1m6',
+  'rec_por_cal0_100_1m12',
+  'rec_mora_0_1m12',
+  'por_cal4_var1m3',
+  'por_mora30_var1m3',
+  'por_cal34_1m_max2m12',
+  'rec_mora0_1m12',
+  'por_castigo_var1m3',
+  'saldo_var1m6',
+  'disp_efectivo_max1m3_flg',
+  'linea_total_max1m3_flg',
+  'linea_usada_max1m3_flg',
+  'por_uso_linea_var1m6',
+  'linea_activa_var1m3',
+  'disp_efectivo_max1m6_flg',
+  'linea_total_max1m6_flg',
+  'linea_usada_max1m6_flg',
+  'mora_var1m3',
+  'por_cal0_min1m6_min7m12',
+  'por_uso_linea_var1m3',
+  'linea_activa_1m_max2m12',
+  'linea_activa_var1m12',
+  'linea_activa_max1m3_flg',
+  'por_uso_linea_1m_max2m12',
+  'linea_activa_var1m6',
+  'linea_activa_max1m6_flg',
+  'por_uso_linea_max1m6_max7m12',
+  'linea_activa_max1m6_max7m12',
+  'por_uso_linea_max1m3_max4m12',
+  'por_uso_efectivo_var1m3',
+  'por_uso_efectivo_1m_max2m12'
+  # # iv train mayor a 2% restantes
+  # 'por_cal0_var1m3',
+  # 'por_mora_0_var1m12',
+  # 'por_mora_0_var1m3',
+  # 'por_vig_min1m6_min7m12',
+  # 'por_cal0_var1m12',
+  # 'por_vig_var1m12',
+  # 'por_vig_var1m3',
+  # 'por_vig_min1m3_min4m12',
+  # 'por_mora_0_var1m6',
+  # 'por_mora30_var1m12',
+  # 'por_cal0_var1m6',
+  # 'por_cal34_var1m12',
+  # 'por_cal0_1m_min2m12',
+  # 'por_mora30_max1m3_max4m12',
+  # 'por_mora60_var1m12',
+  # 'por_mora0_var1m12',
+  # 'por_mora90_var1m12',
+  # 'por_mora90_1m_max2m12',
+  # 'por_mora90_max1m3_max4m12',
+  # 'mora_max1m3_max4m12',
+  # 'por_mora60_max1m3_max4m12',
+  # 'por_mora30_var1m6',
+  # 'por_cal4_1m_max2m12',
+  # 'por_mora90_var1m6',
+  # 'por_castigo_max1m6_max7m12',
+  # 'por_cal34_var1m3',
+  # 'por_cal1234_max1m3_max4m12',
+  # 'saldo_max1m3_max4m12',
+  # 'por_cal34_max1m3_max4m12',
+  # 'por_mora_0_min1m3_min4m12',
+  # 'por_mora60_var1m6',
+  # 'por_mora90_max1m6_max7m12',
+  # 'por_cal4_max1m3_max4m12',
+  # 'por_mora90_var1m3',
+  # 'por_vig_1m_min2m12',
+  # 'por_cal4_max1m6_max7m12',
+  # 'por_mora0_max1m6_max7m12',
+  # 'por_cal0_min1m3_min4m12',
+  # 'rec_mora30_1m12',
+  # 'por_mora60_max1m6_max7m12',
+  # 'por_castigo_1m_max2m12',
+  # 'por_cal234_var1m3',
+  # 'por_cal1234_var1m3',
+  # 'por_castigo_max1m3_max4m12',
+  # 'por_cal4_var1m12',
+  # 'por_cal34_var1m6',
+  # 'por_castigo_var1m12',
+  # 'por_cal234_max1m3_max4m12',
+  # 'por_cal234_var1m12',
+  # 'saldo_max1m6_max7m12',
+  # 'por_mora0_var1m3',
+  # 'por_cal34_max1m6_max7m12',
+  # 'saldo_1m_max2m12',
+  # 'por_mora0_var1m6',
+  # 'por_cal234_1m_max2m12',
+  # 'por_cal234_var1m6',
+  # 'por_mora0_1m_max2m12',
+  # 'por_mora0_max1m3_max4m12',
+  # 'por_uso_efectivo_var1m6',
+  # 'por_cal1234_var1m12',
+  # 'por_cal1234_1m_max2m12',
+  # 'por_mora_0_1m_min2m12',
+  # 'por_mora30_max1m6_max7m12',
+  # 'por_uso_efectivo_var1m12',
+  # 'por_cal1234_var1m6',
+  # 'por_uso_efectivo_max1m6_max7m12',
+  # 'por_cal1234_max1m6_max7m12',
+  # 'linea_activa_max1m3_max4m12',
+  # 'disp_efectivo_max1m12_flg',
+  # 'linea_total_max1m12_flg',
+  # 'linea_usada_max1m12_flg',
+  # 'mora_var1m12',
+  # 'por_cal234_max1m6_max7m12',
+  # 'linea_activa_max1m12_flg',
+  # 'por_uso_efectivo_max1m3_max4m12',
+  # 'saldo_var1m12',
+  # 'mora_var1m6',
+  # 'mora_max1m6_max7m12',
+  # # iv test mayor a 2% restantes
+  # 'por_me_1m_max2m12',
+  # 'por_me_max1m3_max4m12',
+  # 'por_me_max1m6_max7m12',
+  # 'por_me_var1m6',
+  # 'por_me_var1m3',
+  # 'por_uso_linea_var1m12',
+  # 'por_novig_var1m12'
+)
+
+
+length(var_cat)
+length(unique(var_cat))
+```
+

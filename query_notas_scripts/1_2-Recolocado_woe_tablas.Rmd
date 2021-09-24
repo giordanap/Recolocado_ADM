@@ -4,7 +4,7 @@
 ######      Inicio        #####
 ###############################
 
-data = read.csv( paste(path,"bases/construccion/","base_axes_sinRepros_final_3.csv", sep="") , header = T, sep = ',')
+data = read.csv( paste(path,"bases/construccion/","base_axes_sinRepros_final_4.csv", sep="") , header = T, sep = ',')
 
 data[, 'filtro'] = ifelse((data$indeterminado + data$insuficiente) == 0, 0, 1)
 data[, 'tm'] = data$malo
@@ -29,39 +29,33 @@ rownames(y_test) = y_test$X; y_test$X = NULL
 
 ```{r}
 var_num = c(
-  # despues de filtros
-  "ci",
-  "cuota",
-  "pv",
-  "saldo_cal4_max1m6",
-  "por_cal34_max1m3",
-  "can_emp_1m",
+  # # # despues de filtros
+  # "por_mora60_max1m12",
+  # "saldo_mora60_max1m12",
+  # "provision",
+  # "can_emp_1m",
+  # "disp_efectivo_max1m6",
+  # "por_uso_efectivo_max1m6",
+  # "por_uso_linea_max1m6",
+  # variables de perimetro
   "edad",
-  "saldo_cal1234_max1m3",
-  "disp_efectivo_max1m6",
-  "por_uso_efectivo_max1m6",
-  "por_uso_linea_max1m6",
-  # modelo vigente
-  "linea_total_1m",
-  "frec_mora60_1m12",
-  # IV mayores a 2% en train y test
-  'frec_calificacion_0_1m12',
-  'por_mora_0_min1m6',
-  'por_mora_0_min1m3',
-  'por_vig_min1m3',
-  'por_vig_min1m6',
-  'por_vig_min1m12',
-  'por_mora_0_min1m12',
-  'calificacion_max1m6',
-  'linea_usada_max1m6',
-  'linea_total_max1m6',
-  'disp_efectivo_max1m12',
-  'por_uso_efectivo_max1m12',
-  'linea_activa_max1m6',
-  'linea_total_max1m12',
-  'linea_activa_max1m12',
-  'por_cal0_min1m12'
-  # # ultimo mes
+  "ci",
+  "pv",
+  # "ci_pv", # se crea
+  "cuota",
+  "calificacion_max1m12",
+  "saldo_max1m12",
+  "mora_max1m12",
+  "saldo_castigo_max1m12",
+  "linea_activa_max1m12",
+  "por_uso_linea_max1m12",
+  "expcred_1m12",
+  "frec_por_cal0_100_1m12"
+  # # # modelo vigente
+  # "linea_total_1m",
+  # "frec_mora60_1m12",
+  # # # IV mayores a 2% en train y test
+  # # # ultimo mes
   # "por_uso_linea_1m",
   # "mora_1m",
   # "saldo_1m",
@@ -88,72 +82,8 @@ var_num = c(
   # 'saldo_cal1234_1m',
   # 'por_mora0_1m',
   # 'saldo_mora0_1m',
-  # # IV mayor a 2% en train restantes
-  # 'saldo_cal34_max1m3',
-  # 'por_mora90_max1m3',
-  # 'saldo_mora90_max1m3',
-  # 'por_mora60_max1m3',
-  # 'saldo_mora60_max1m3',
-  # 'por_cal4_max1m6',
-  # 'por_mora90_max1m6',
-  # 'saldo_mora90_max1m6',
-  # 'por_mora60_max1m6',
-  # 'saldo_mora60_max1m6',
-  # 'por_cal4_max1m3',
-  # 'frec_por_cal0_100_1m12',
-  # 'saldo_cal4_max1m3',
-  # 'por_mora60_max1m12',
-  # 'saldo_mora60_max1m12',
-  # 'calificacion_max1m12',
-  # 'por_mora90_max1m12',
-  # 'saldo_mora90_max1m12',
-  # 'por_castigo_max1m6',
-  # 'saldo_castigo_max1m6',
-  # 'por_cal0_min1m3',
-  # 'saldo_cal34_max1m6',
-  # 'por_cal4_max1m12',
-  # 'por_castigo_max1m3',
-  # 'saldo_castigo_max1m3',
-  # 'saldo_cal4_max1m12',
-  # 'por_cal34_max1m12',
-  # 'por_cal34_max1m6',
-  # 'saldo_cal34_max1m12',
-  # 'frec_mora_0_1m12',
-  # 'calificacion_max1m3',
-  # 'por_cal234_max1m3',
-  # 'saldo_cal234_max1m3',
-  # 'por_mora30_max1m3',
-  # 'saldo_mora30_max1m3',
-  # 'por_cal0_min1m6',
-  # 'frec_por_cal4_100_1m12',
-  # 'por_castigo_max1m12',
-  # 'saldo_castigo_max1m12',
-  # 'por_mora30_max1m6',
-  # 'saldo_mora30_max1m6',
-  # 'por_cal1234_max1m3',
-  # 'frec_calificacion_4_1m12',
-  # 'saldo_cal234_max1m6',
-  # 'frec_mora90_1m12',
-  # 'frec_mora120_1m12',
-  # 'por_cal234_max1m6',
-  # 'frec_calificacion_34_1m12',
-  # 'por_mora30_max1m12',
-  # 'saldo_mora30_max1m12',
-  # 'frec_mora30_1m12',
-  # 'mora_max1m3',
-  # 'por_mora0_max1m3',
-  # 'saldo_mora0_max1m3',
-  # 'frec_calificacion_1234_1m12',
-  # 'por_cal234_max1m12',
-  # 'frec_mora0_1m12',
-  # 'saldo_cal234_max1m12',
-  # 'frec_calificacion_234_1m12',
-  # 'linea_usada_max1m12',
-  # 'por_uso_linea_max1m12',
-  # 'saldo_cal1234_max1m6',
-  # 'cv_saldo_1m12',
-  # 'por_cal1234_max1m6'
-  # # IV mayor a 2% en test restantes
+  # # # IV mayor a 2% en train restantes
+  # # # IV mayor a 2% en test restantes
 )
 
 length(var_num)
@@ -168,156 +98,13 @@ length(unique(var_num))
 var_cat = c(
   # Fisher
   # rescatamos demosgraficas
-  "marca",
   "perfil",
   "estado_civil",
-  # IV mayor a 2% en ambos
-  'calificacion_var1m12',
-  'calificacion_max1m6_max7m12',
-  'calificacion_var1m6',
-  'calificacion_max1m3_max4m12',
-  'calificacion_var1m3',
-  'calificacion_1m_max2m12',
-  'rec_por_cal4_100_1m12',
-  'por_vig_var1m6',
-  'rec_calificacion_0_1m12',
-  'saldo_var1m3',
-  'mora_1m_max2m12',
-  'por_mora_0_min1m6_min7m12',
-  'rec_mora120_1m12',
-  'rec_calificacion_1234_1m12',
-  'rec_calificacion_34_1m12',
-  'rec_mora90_1m12',
-  'rec_calificacion_4_1m12',
-  'rec_mora60_1m12',
-  'rec_calificacion_234_1m12',
-  'disp_efectivo_1m_flg',
-  'linea_total_1m_flg',
-  'linea_usada_1m_flg',
-  'por_mora60_1m_max2m12',
-  'por_mora60_var1m3',
-  'linea_activa_1m_flg',
-  'por_cal4_var1m6',
-  'por_castigo_var1m6',
-  'rec_por_cal0_100_1m12',
-  'rec_mora_0_1m12',
-  'por_cal4_var1m3',
-  'por_mora30_var1m3',
-  'por_cal34_1m_max2m12',
-  'rec_mora0_1m12',
-  'por_castigo_var1m3',
-  'saldo_var1m6',
-  'disp_efectivo_max1m3_flg',
-  'linea_total_max1m3_flg',
-  'linea_usada_max1m3_flg',
-  'por_uso_linea_var1m6',
-  'linea_activa_var1m3',
-  'disp_efectivo_max1m6_flg',
-  'linea_total_max1m6_flg',
-  'linea_usada_max1m6_flg',
-  'mora_var1m3',
-  'por_cal0_min1m6_min7m12',
-  'por_uso_linea_var1m3',
-  'linea_activa_1m_max2m12',
-  'linea_activa_var1m12',
-  'linea_activa_max1m3_flg',
-  'por_uso_linea_1m_max2m12',
-  'linea_activa_var1m6',
-  'linea_activa_max1m6_flg',
-  'por_uso_linea_max1m6_max7m12',
-  'linea_activa_max1m6_max7m12',
-  'por_uso_linea_max1m3_max4m12',
-  'por_uso_efectivo_var1m3',
-  'por_uso_efectivo_1m_max2m12'
-  # # iv train mayor a 2% restantes
-  # 'por_cal0_var1m3',
-  # 'por_mora_0_var1m12',
-  # 'por_mora_0_var1m3',
-  # 'por_vig_min1m6_min7m12',
-  # 'por_cal0_var1m12',
-  # 'por_vig_var1m12',
-  # 'por_vig_var1m3',
-  # 'por_vig_min1m3_min4m12',
-  # 'por_mora_0_var1m6',
-  # 'por_mora30_var1m12',
-  # 'por_cal0_var1m6',
-  # 'por_cal34_var1m12',
-  # 'por_cal0_1m_min2m12',
-  # 'por_mora30_max1m3_max4m12',
-  # 'por_mora60_var1m12',
-  # 'por_mora0_var1m12',
-  # 'por_mora90_var1m12',
-  # 'por_mora90_1m_max2m12',
-  # 'por_mora90_max1m3_max4m12',
-  # 'mora_max1m3_max4m12',
-  # 'por_mora60_max1m3_max4m12',
-  # 'por_mora30_var1m6',
-  # 'por_cal4_1m_max2m12',
-  # 'por_mora90_var1m6',
-  # 'por_castigo_max1m6_max7m12',
-  # 'por_cal34_var1m3',
-  # 'por_cal1234_max1m3_max4m12',
-  # 'saldo_max1m3_max4m12',
-  # 'por_cal34_max1m3_max4m12',
-  # 'por_mora_0_min1m3_min4m12',
-  # 'por_mora60_var1m6',
-  # 'por_mora90_max1m6_max7m12',
-  # 'por_cal4_max1m3_max4m12',
-  # 'por_mora90_var1m3',
-  # 'por_vig_1m_min2m12',
-  # 'por_cal4_max1m6_max7m12',
-  # 'por_mora0_max1m6_max7m12',
-  # 'por_cal0_min1m3_min4m12',
-  # 'rec_mora30_1m12',
-  # 'por_mora60_max1m6_max7m12',
-  # 'por_castigo_1m_max2m12',
-  # 'por_cal234_var1m3',
-  # 'por_cal1234_var1m3',
-  # 'por_castigo_max1m3_max4m12',
-  # 'por_cal4_var1m12',
-  # 'por_cal34_var1m6',
-  # 'por_castigo_var1m12',
-  # 'por_cal234_max1m3_max4m12',
-  # 'por_cal234_var1m12',
-  # 'saldo_max1m6_max7m12',
-  # 'por_mora0_var1m3',
-  # 'por_cal34_max1m6_max7m12',
-  # 'saldo_1m_max2m12',
-  # 'por_mora0_var1m6',
-  # 'por_cal234_1m_max2m12',
-  # 'por_cal234_var1m6',
-  # 'por_mora0_1m_max2m12',
-  # 'por_mora0_max1m3_max4m12',
-  # 'por_uso_efectivo_var1m6',
-  # 'por_cal1234_var1m12',
-  # 'por_cal1234_1m_max2m12',
-  # 'por_mora_0_1m_min2m12',
-  # 'por_mora30_max1m6_max7m12',
-  # 'por_uso_efectivo_var1m12',
-  # 'por_cal1234_var1m6',
-  # 'por_uso_efectivo_max1m6_max7m12',
-  # 'por_cal1234_max1m6_max7m12',
-  # 'linea_activa_max1m3_max4m12',
-  # 'disp_efectivo_max1m12_flg',
-  # 'linea_total_max1m12_flg',
-  # 'linea_usada_max1m12_flg',
-  # 'mora_var1m12',
-  # 'por_cal234_max1m6_max7m12',
-  # 'linea_activa_max1m12_flg',
-  # 'por_uso_efectivo_max1m3_max4m12',
-  # 'saldo_var1m12',
-  # 'mora_var1m6',
-  # 'mora_max1m6_max7m12',
-  # # iv test mayor a 2% restantes
-  # 'por_me_1m_max2m12',
-  # 'por_me_max1m3_max4m12',
-  # 'por_me_max1m6_max7m12',
-  # 'por_me_var1m6',
-  # 'por_me_var1m3',
-  # 'por_uso_linea_var1m12',
-  # 'por_novig_var1m12'
+  "marca",
+  "rec_por_cal4_100_1m12"
+  # # # IV mayor a 2% en ambos
+  # # # iv train mayor a 2% restantes
 )
-
 
 length(var_cat)
 length(unique(var_cat))
@@ -375,189 +162,81 @@ dim(data_test)
 ```
 
 ```{r}
-c(var_num[1:27],"ci_pv")
+c(var_num[1:11],"ci_pv")
 biv_num = list(name = c(), iv_tr = c(), iv_ts = c())
 ```
 
 ```{r}
-# bin = c(0.04,0.05) # iv test bajo
-# tb = AnalisisWoe('ci_pv', list(data_train, data_test), 'numeric', bin)
+# bin = c(0.0252, 0.049718)
+# tb = AnalisisWoe('ci_pv', list(data_train, data_test), 'numeric', bin) # sin sentido
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-# bin = c(0,50,99) # iv test bajo
-# tb = AnalisisWoe('por_cal0_min1m12', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(1400,3000)
-tb = AnalisisWoe('linea_activa_max1m12', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(1000)
-tb = AnalisisWoe('linea_total_max1m12', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(1300)
-tb = AnalisisWoe('linea_activa_max1m6', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(0) # sin sentido
-# tb = AnalisisWoe('por_uso_efectivo_max1m12', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(0) # sin sentido
-# tb = AnalisisWoe('disp_efectivo_max1m12', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(1000, 2600)
-tb = AnalisisWoe('linea_total_max1m6', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(564) # Sin sentido
-# tb = AnalisisWoe('linea_usada_max1m6', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-A=c("0")
-B=c("8","9")
-C=c("1","2","3","4")
-tb = AnalisisWoe('calificacion_max1m6', list(data_train, data_test), 'factor', list(A,B,C))
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(0)
-tb = AnalisisWoe('por_mora_0_min1m12', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(0)
-tb = AnalisisWoe('por_vig_min1m12', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(0)
-tb = AnalisisWoe('por_vig_min1m6', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(0)
-tb = AnalisisWoe('por_vig_min1m3', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(0)
-tb = AnalisisWoe('por_mora_0_min1m3', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-bin = c(0)
-tb = AnalisisWoe('por_mora_0_min1m6', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(0)# iv test bajo
+# bin = c(6)# iv test bajo
 # tb = AnalisisWoe('frec_calificacion_0_1m12', list(data_train, data_test), 'numeric', bin)
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-# bin = c(0:4)# iv test bajo
-# tb = AnalisisWoe('frec_mora60_1m12', list(data_train, data_test), 'numeric', bin)
+# bin = c(7)
+# tb = AnalisisWoe('expcred_1m12', list(data_train, data_test), 'numeric', bin) # iv test bajo
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-bin = c(1306.712)
-tb = AnalisisWoe('linea_total_1m', list(data_train, data_test), 'numeric', bin)
+bin = c(0.83916)
+tb = AnalisisWoe('por_uso_linea_max1m12', list(data_train, data_test), 'numeric', bin)
 tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-# bin = c(0.576675) # sin sentido logico
-# tb = AnalisisWoe('por_uso_linea_max1m6', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
+bin = c(1000)
+tb = AnalisisWoe('linea_activa_max1m12', list(data_train, data_test), 'numeric', bin)
+tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-# bin = c(0) # sin sentido logico
-# tb = AnalisisWoe('por_uso_efectivo_max1m6', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(0) # sin sentido logico
-# tb = AnalisisWoe('disp_efectivo_max1m6', list(data_train, data_test), 'numeric', bin)
+# bin = c(0)
+# tb = AnalisisWoe('saldo_castigo_max1m12', list(data_train, data_test), 'numeric', bin) # iv test bajo
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
 # bin = c(0) # iv test bajo
-# tb = AnalisisWoe('saldo_cal1234_max1m3', list(data_train, data_test), 'numeric', bin)
+# tb = AnalisisWoe('mora_max1m12', list(data_train, data_test), 'numeric', bin)
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-bin = c(34, 40, 46, 56)
-tb = AnalisisWoe('edad', list(data_train, data_test), 'numeric', bin)
-tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(1,2) # sin sentido logico
-# tb = AnalisisWoe('can_emp_1m', list(data_train, data_test), 'numeric', bin)
+# bin = c(2637.0805)
+# tb = AnalisisWoe('saldo_max1m12', list(data_train, data_test), 'numeric', bin) # sin sentido
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-# bin = c(0, 99) # iv test bajo
-# tb = AnalisisWoe('por_cal34_max1m3', list(data_train, data_test), 'numeric', bin)
+# A=c("0")
+# B=c("8","9")
+# C=c("1","2","3","4")
+# tb = AnalisisWoe('calificacion_max1m12', list(data_train, data_test), 'factor', list(A,B,C)) # iv test bajo
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
-# bin = c(0, 700.484, 2009.6495) # iv test bajo
-# tb = AnalisisWoe('saldo_cal4_max1m6', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c(36000) # sin sentido
-# tb = AnalisisWoe('pv', list(data_train, data_test), 'numeric', bin)
-# tb; biv_num = biv_iv(biv_num,tb)
-```
-
-```{r}
-# bin = c( 1000, 1283.85, 1381) # iv test bajo
-# tb = AnalisisWoe('cuota', list(data_train, data_test), 'numeric', bin)
+# bin = c(1161.95)
+# tb = AnalisisWoe('cuota', list(data_train, data_test), 'numeric', bin) # sin sentido
 # tb; biv_num = biv_iv(biv_num,tb)
 ```
 
 ```{r}
 bin = c(499)
 tb = AnalisisWoe('ci', list(data_train, data_test), 'numeric', bin)
+tb; biv_num = biv_iv(biv_num,tb)
+```
+
+```{r}
+bin = c(26, 35, 40, 45)
+tb = AnalisisWoe('edad', list(data_train, data_test), 'numeric', bin)
 tb; biv_num = biv_iv(biv_num,tb)
 ```
 
@@ -585,84 +264,22 @@ dim(data_test)
 ```
 
 ```{r}
-var_cat[1:30]
+var_cat
 biv_cat = list(name = c(), iv_tr = c(), iv_ts = c())
 ```
 
 ```{r}
-# A=c("Cero saldo","Menor saldo")
-# B=c("Mayor saldo","Igual saldo")
-# C=c("Mayor saldo")
-# D=c("Cien saldo")
-# tb = AnalisisWoe('saldo_var1m3', list(data_train, data_test), 'factor', list(A,B)) # iv test bajo
+# A=c("1.0","2.0")
+# D=c("3.0","4.0","5.0","6.0","7.0","8.0","9.0","10.0","11.0","12.0","Otros")
+# tb = AnalisisWoe('rec_por_cal4_100_1m12', list(data_train, data_test), 'factor', list(A,D)) # iv test bajo
 # tb; biv_cat = biv_iv(biv_cat,tb)
 ```
 
 ```{r}
-# A=c("1.0","2.0","3.0")
-# B=c("4.0","5.0","6.0","7.0","8.0","9.0","10.0","11.0","12.0")
-# C=c("Otros")
-# tb = AnalisisWoe('rec_calificacion_0_1m12', list(data_train, data_test), 'factor', list(A,B,C)) # iv test bajo
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("Cero por_vig","Mayor por_vig","Menor por_vig","Igual por_vig")
-# B=c("Mayor por_vig","Menor por_vig","Igual por_vig")
-# C=c("Cien por_vig")
-# tb = AnalisisWoe('por_vig_var1m6', list(data_train, data_test), 'factor', list(A,C)) # iv test bajo
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("Cero por_vig","Mayor por_vig","Menor por_vig","Igual por_vig")
-# B=c("Mayor por_vig","Menor por_vig","Igual por_vig")
-# C=c("Cien por_vig")
-# tb = AnalisisWoe('por_vig_var1m6', list(data_train, data_test), 'factor', list(A,C)) # iv test bajo
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("1.0")
-# B=c("2.0","3.0","4.0","5.0","6.0","7.0","8.0","9.0","10.0","11.0","12.0")
-# C=c("Otros")
-# tb = AnalisisWoe('rec_por_cal4_100_1m12', list(data_train, data_test), 'factor', list(A,B,C)) # iv test bajo
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("5.Propietario") # sin sentido
-# tb = AnalisisWoe('calificacion_1m_max2m12', list(data_train, data_test), 'factor', NULL)
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("5.Propietario") # sin sentido
-# tb = AnalisisWoe('calificacion_var1m3', list(data_train, data_test), 'factor', NULL)
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("5.Propietario") # sin sentido
-# tb = AnalisisWoe('calificacion_max1m3_max4m12', list(data_train, data_test), 'factor', NULL)
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("5.Propietario") # sin sentido
-# tb = AnalisisWoe('calificacion_var1m6', list(data_train, data_test), 'factor', NULL)
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("5.Propietario") # sin sentido
-# tb = AnalisisWoe('calificacion_max1m6_max7m12', list(data_train, data_test), 'factor', NULL)
-# tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c("5.Propietario") # sin sentido
-# tb = AnalisisWoe('calificacion_var1m12', list(data_train, data_test), 'factor', NULL)
+# A=c('KIA','GREAT WALL','HYUNDAI','PEUGEOT','TOYOTA','NISSAN','RENAULT')
+# B=c('', 'DFSK','CHEVROLET','DFSK MULTIPROPOSITO','BYD','CITROEN','FORD','HONDA','SUBARU')
+# C=c('VOLVO','MAHINDRA','HAVAL','FOTON','GEELY','JAC','HAIMA','SUZUKI','INTERNATIONAL','FAW','ZOTYE','BAIC YINXIANG','MAZDA','CHERY','MITSUBISHI','BAIC','BRILLIANCE','FIAT','MG','SHINERAY','DONGFENG','CHANGAN','JINBEI','JIMBEI','SWM','SOUEAST','LIFAN','JMC','SSANG YONG','VOLKSWAGEN')
+# tb = AnalisisWoe('marca', list(data_train, data_test), 'factor', list(A,B,C))# sin sentido
 # tb; biv_cat = biv_iv(biv_cat,tb)
 ```
 
@@ -674,16 +291,8 @@ biv_cat = list(name = c(), iv_tr = c(), iv_ts = c())
 
 ```{r}
 A=c("5.Propietario")
-tb = AnalisisWoe('perfil', list(data_train, data_test), 'factor', list(A))# sin sentido
+tb = AnalisisWoe('perfil', list(data_train, data_test), 'factor', NULL)
 tb; biv_cat = biv_iv(biv_cat,tb)
-```
-
-```{r}
-# A=c('KIA','GREAT WALL','HYUNDAI','PEUGEOT','TOYOTA','NISSAN','RENAULT')
-# B=c('', 'DFSK','CHEVROLET','DFSK MULTIPROPOSITO','BYD','CITROEN','FORD','HONDA','SUBARU')
-# C=c('VOLVO','MAHINDRA','HAVAL','FOTON','GEELY','JAC','HAIMA','SUZUKI','INTERNATIONAL','FAW','ZOTYE','BAIC YINXIANG','MAZDA','CHERY','MITSUBISHI','BAIC','BRILLIANCE','FIAT','MG','SHINERAY','DONGFENG','CHANGAN','JINBEI','JIMBEI','SWM','SOUEAST','LIFAN','JMC','SSANG YONG','VOLKSWAGEN')
-# tb = AnalisisWoe('marca', list(data_train, data_test), 'factor', list(A,B,C))# sin sentido
-# tb; biv_cat = biv_iv(biv_cat,tb)
 ```
 
 ```{r}
